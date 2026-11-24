@@ -9,11 +9,10 @@ ENV PYTHONUNBUFFERED=1
 # Aggiorna pip
 RUN pip install --no-cache-dir --upgrade pip
 
-# Copia prima requirements.txt per sfruttare la cache Docker
-COPY requirements.txt /app/requirements.txt
-
-# Installa le dipendenze
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Copia metadati e codice, poi installa la libreria con le sue dipendenze
+COPY pyproject.toml README.md ./
+COPY to_juries ./to_juries
+RUN pip install --no-cache-dir -e .
 
 # Mantiene attivo il container
 CMD ["tail", "-f", "/dev/null"]

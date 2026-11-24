@@ -1,6 +1,6 @@
 services:
 
-  to_giuries:
+  to_juries:
     build:
       context: ..
       dockerfile: docker_setup/Dockerfile
@@ -9,3 +9,4 @@ services:
       - ..:/app
 
     working_dir: /app
+    env_file: ../.env

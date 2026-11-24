@@ -1,0 +1,5 @@
+pair_id,kind,split,task_prompt,reference_file,cutoff,baseline_file,candidate_file
+p01,test,calibration,Describe the conflict dynamics in the period.,data/p01_reference.txt,2024-12-12,data/p01_pre.txt,data/p01_post.txt
+p02,test,test,Describe the conflict dynamics in the period.,data/p02_reference.txt,2024-12-12,data/p02_pre.txt,data/p02_post.txt
+c01,control_neg,test,Describe the conflict dynamics in the period.,data/c01_reference.txt,2024-12-12,data/c01_a.txt,data/c01_a_copy.txt
+c02,control_pos,test,Describe the conflict dynamics in the period.,data/c02_reference.txt,2024-12-12,data/c02_good.txt,data/c02_degraded.txt

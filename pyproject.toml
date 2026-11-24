@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "to_juries"
+version = "0.3.0"
+description = "Evaluate two reports against an expert reference with LLM judges (GPT, Gemini), using a fixed evaluation prompt, both A/B orders and paired statistics."
+readme = "README.md"
+requires-python = ">=3.15"
+license = { text = "MIT" }
+dependencies = [
+    "pydantic>=2.5",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "pandas>=2.0",
+    "python-dotenv>=1.0",
+    "openai>=1.40",
+    "google-genai>=1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["to_juries*"]
+
+[tool.setuptools.package-data]
+to_juries = ["prompts/*.md"]
