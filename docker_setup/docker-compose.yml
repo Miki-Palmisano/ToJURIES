@@ -1,0 +1,11 @@
+services:
+
+  to_giuries:
+    build:
+      context: ..
+      dockerfile: docker_setup/Dockerfile
+
+    volumes:
+      - ..:/app
+
+    working_dir: /app
