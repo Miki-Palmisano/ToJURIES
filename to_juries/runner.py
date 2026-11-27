@@ -206,19 +206,15 @@ def run_job(
     if path.exists() and not force:
         try:
             old = json.loads(path.read_text(encoding="utf-8"))
-            # The key is now saved as "cache_key"; "prompt_hash" is still read,
-            # so files written by the previous version stay valid.
-            old_key = old.get("cache_key", old.get("prompt_hash")) if isinstance(old, dict) else None
-            if old_key == h and not old.get("error"):
+            if isinstance(old, dict) and old.get("cache_key") == h and not old.get("error"):
                 return "cached"
-        except (OSError, ValueError):  # Also unreadable files and bad encodings
+        except (OSError, ValueError):
             pass
 
     # --- Record to save ------------------------------------------------------
-    # "cache_key" instead of "prompt_hash": it covers judge + rendered prompt,
-    # not just the prompt (config.json keeps "prompt_hash" for the prompt alone).
+    # Job metadata + cache key (judge configuration + rendered prompt).
     record = {"job": {"pair_id": job.pair.pair_id, "judge": job.judge.name,
-                      "order": job.order, "rep": job.rep}, "cache_key": h}
+        "order": job.order, "rep": job.rep}, "cache_key": h}
 
     # --- Attempts ------------------------------------------------------------
     # note: text appended to the prompt after an unparsable reply; last: last error seen;
@@ -383,19 +379,16 @@ def load_run_records(
 ) -> list[dict]:
     """
     Read the successful calls that belong to the run described in ``out_dir/config.json``:
-    its judges, pairs, orders and repetitions. If config.json is missing or unreadable, every
-    successful call in the folder is returned (with a warning).
-    :param out_dir: results folder
+    its judges, pairs, orders and repetitions.
+    :param out_dir: results folder created by ``Evaluator.evaluate``
     :return: one dict per call, as in :func:`load_records`
+    :raises RuntimeError: if config.json is missing, unreadable or incomplete
     """
-    # New function, used by the evaluator and the analysis.
     out = Path(out_dir)
     try:
         meta = json.loads((out / "config.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        log.warning("no readable config.json in %s: loading every call in the folder", out)
-        return load_records(out)
-    opts = meta.get("options") or {}
-    judges = [j["name"] for j in meta.get("judges") or []] or None
-    return load_records(out, judges=judges, pair_ids=meta.get("pair_ids"),
-                        orders=opts.get("orders"), reps=opts.get("reps"))
+        opts = meta["options"]
+        return load_records(out, judges=[j["name"] for j in meta["judges"]],
+                            pair_ids=meta["pair_ids"], orders=opts["orders"], reps=opts["reps"])
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise RuntimeError(f"{out} has no valid config.json (was it created by Evaluator.evaluate?): {exc}") from exc
