@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip
 # Copia metadati e codice, poi installa la libreria con le sue dipendenze
 COPY pyproject.toml README.md ./
 COPY to_juries ./to_juries
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -e . --config-settings editable_mode=compat
 
 # Mantiene attivo il container
 CMD ["tail", "-f", "/dev/null"]

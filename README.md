@@ -1,6 +1,6 @@
 # To_JURIES
 
-Confronta due report (es. PRE vs POST) con giudici LLM (GPT, Gemini) rispetto a un articolo di riferimento, usando **il tuo prompt di valutazione, senza modifiche** (`reportjury/prompts/evaluation.md`). Vengono sostituiti solo i cinque segnaposto (`{TASK_PROMPT}`, `{ARTICLE_TEXT}`, `{REPORT_A}`, `{REPORT_B}`, `{TASK_CUTOFF_DATE}`).
+Confronta due report (es. PRE vs POST) con giudici LLM (GPT, Gemini) rispetto a un articolo di riferimento, usando **il tuo prompt di valutazione, senza modifiche** (`to_juries/prompts/evaluation.md`). Vengono sostituiti solo i cinque segnaposto (`{TASK_PROMPT}`, `{ARTICLE_TEXT}`, `{REPORT_A}`, `{REPORT_B}`, `{TASK_CUTOFF_DATE}`).
 
 ## Uso
 

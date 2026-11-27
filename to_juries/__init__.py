@@ -1,4 +1,4 @@
-"""reportjury: evaluate two reports against an expert reference with LLM judges."""
+"""to_juries: evaluate two reports against an expert reference with LLM judges."""
 
 try:  # keys may live in a .env file
     from dotenv import load_dotenv
