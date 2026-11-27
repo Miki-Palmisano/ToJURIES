@@ -237,13 +237,13 @@ def run_job(
             note = ("\n\nYour previous reply could not be used: "
                     f"{str(exc)[:300]}\nRepeat the evaluation and end with exactly the requested JSON object.")
         except Exception as exc:  # noqa: BLE001 - network, rate limits, empty replies
-            # Transient errors: exponential backoff 2, 4, 8, ... seconds, capped at 60.
+            # Invalid key, no permission or wrong endpoint: retrying would not help,
+            # so abort the whole run with a clear message.
+            if _is_config_error(exc):
+                raise ConfigError(f"judge {job.judge.name!r}: {exc}") from exc
             last = exc
-
-            # No wait after the last attempt (it would only delay the error), and
-            # random jitter so that threads hit by the same rate limit do not retry together.
             if not is_last:
-                time.sleep(min(60.0, 2.0 * 2**attempt) * random.uniform(0.5, 1.0))
+                time.sleep(min(60.0, 2.0 * 2 ** attempt) * random.uniform(0.5, 1.0))
         else:
             # The write is outside the try, so a disk error is raised instead of being
             # mistaken for a network error and causing new (paid) calls to the model.
@@ -392,3 +392,14 @@ def load_run_records(
                             pair_ids=meta["pair_ids"], orders=opts["orders"], reps=opts["reps"])
     except (OSError, ValueError, KeyError, TypeError) as exc:
         raise RuntimeError(f"{out} has no valid config.json (was it created by Evaluator.evaluate?): {exc}") from exc
+
+def _is_config_error(exc: Exception) -> bool:
+    """
+    Tell whether an API error is a configuration problem that retrying cannot fix
+    (invalid key, no permission, wrong endpoint/deployment/model).
+    :param exc: the exception raised by the provider
+    :return: True for HTTP 401, 403 and 404
+    """
+    # openai uses `status_code`, google-genai uses `code`.
+    code = getattr(exc, "status_code", None) or getattr(exc, "code", None)
+    return code in (401, 403, 404)

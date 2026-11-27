@@ -3,7 +3,6 @@ import to_juries as tj
 # Forma la Giuria
 judges = [
     tj.AzureOpenAI(deployment="gpt-6-astra", temperature=None),
-    tj.Gemini(model="gemini-4-argon"),
 ]
 
 # Definisci il prompt
@@ -23,14 +22,8 @@ data = tj.PairDataset.from_records([
 ])
 
 # Imposta la giuria con i parametri
-juries = tj.Evaluator(judges, prompt, systems=("PRE", "POST"), orders=("AB", "BA"))
+juries = tj.Evaluator(judges, prompt, labels=("PRE", "POST"), orders=("AB", "BA"))
 
 # Avvia la valutazione
-run = juries.evaluate(data, out_dir="results/exp1")   # crea la cartella con i JSON, token richiesti
-res = run.analyze()                                         # opzionale: restituisce dettagli statistici sulle valutazioni, no token richiesti
-es = run.analyze()
-print(res["summary"])     # media e overall per giudice e giuria
-print(res["gain_stats"])  # statistiche sul guadagno (la giuria ha anche ci_low_boot / ci_high_boot)
-print(res["agreement"])   # accordo tra i giudici
-print(res["flags"])       # contraddizioni e leakage
-print(res["votes"])       # conteggi di better_overall
+run = juries.evaluate(data, out_dir="results/exp2") # crea la cartella con i JSON, token richiesti
+res = run.stats() # opzionale: restituisce dettagli statistici sulle valutazioni, no token richiesti

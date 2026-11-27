@@ -46,7 +46,7 @@ class Run:
         # FIX: leftover files from earlier runs in the same folder are ignored.
         return load_run_records(self.out_dir)
 
-    def analyze(self) -> dict:
+    def stats(self) -> dict:
         """
         Analyse the results saved in the folder (local, no calls to the models, no tokens used).
         Writes report.md and the CSV tables into the folder.
@@ -169,12 +169,14 @@ class Evaluator:
 
         # --- Run the calls ---------------------------------------------------
         # run_all handles cache, concurrency and retries, and returns the counts {"ok", "cached", "error"}.
-        counts = run_all(pairs, self.judges, self.prompt, self.config, out, force=force)
+        try:
+            counts = run_all(pairs, self.judges, self.prompt, self.config, out, force=force)
+        finally:
+            # Write results.json even if the run is aborted (e.g. a ConfigError for one judge
+            # or Ctrl+C), so the calls that succeeded until then are visible.
+            records = load_run_records(out)
+            self._write_results(out, records)
 
-        # --- Collect and (optionally) analyse --------------------------------
-        # Only the calls of this run (judges, pairs, orders and repetitions in config.json).
-        records = load_run_records(out)
-        self._write_results(out, records)
         run = Run(out, counts)
         # The analysis runs only if requested and if at least one call succeeded
         # (otherwise analyze() would raise RuntimeError).

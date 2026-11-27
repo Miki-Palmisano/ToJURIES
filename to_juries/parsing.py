@@ -41,9 +41,7 @@ class ReportScores(BaseModel):
     time_series_analysis: Score | None = None
     central_argument: Score | None = None
     language_quality: Score | None = None
-    # Values written by the model: read but not used (mean and overall are recomputed in code).
-    mean: float | None = None
-    overall: float | None = None
+
     # Flags: number of major contradictions and whether the report uses information after the cutoff.
     major_contradictions: Count | None = None   # FIX: >= 0
     temporal_leakage: bool | None = None
