@@ -13,8 +13,14 @@ class Gemini(Provider):
 
     kind = "gemini"
 
-    def __init__(self, model: str, *, api_key: str | None = None, temperature: float | None = None,
-                 max_output_tokens: int | None = 16000, name: str = "gemini") -> None:
+    def __init__(self,
+                 model: str,
+                 *,
+                 api_key: str | None = None,
+                 temperature: float | None = None,
+                 max_output_tokens: int | None = None,
+                 name: str = "gemini"
+    ) -> None:
         """
         Create the Gemini judge. The key is read from the argument or, if missing, from the
         environment variables (for example from the ``.env`` file); it is never saved in the results.
@@ -27,9 +33,9 @@ class Gemini(Provider):
         :raises ConfigError: if the key is missing
         """
         super().__init__(name, model, temperature, max_output_tokens)
-        key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+        key = api_key or os.environ.get("GEMINI_API_KEY")
         if not key:
-            raise ConfigError("Gemini: missing api_key (argument or GEMINI_API_KEY / GOOGLE_API_KEY)")
+            raise ConfigError("Gemini: missing api_key (argument or GEMINI_API_KEY)")
         from google import genai
         from google.genai import types
 
@@ -64,5 +70,8 @@ class Gemini(Provider):
             raise ProviderError(f"empty Gemini response (finish_reason={reason})")
         um = getattr(resp, "usage_metadata", None)
         usage = {"input_tokens": getattr(um, "prompt_token_count", None),
-                 "output_tokens": getattr(um, "candidates_token_count", None)} if um else {}
+            "output_tokens": getattr(um, "candidates_token_count", None),
+
+            # Thinking tokens are billed as output but not counted in candidates_token_count.
+            "thinking_tokens": getattr(um, "thoughts_token_count", None)} if um else {}
         return LLMResponse(text=text, usage=usage)

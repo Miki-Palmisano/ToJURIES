@@ -19,9 +19,16 @@ class AzureOpenAI(Provider):
 
     kind = "azure"
 
-    def __init__(self, deployment: str, *, endpoint: str | None = None, api_version: str | None = None,
-                 api_key: str | None = None, temperature: float | None = None,
-                 max_output_tokens: int | None = 16000, name: str = "azure") -> None:
+    def __init__(self,
+                 deployment: str,
+                 *,
+                 endpoint: str | None = None,
+                 api_version: str | None = None,
+                 api_key: str | None = None,
+                 temperature: float | None = None,
+                 max_output_tokens: int | None = None,
+                 name: str = "azure"
+    ) -> None:
         """
         Create the Azure OpenAI judge. Keys and endpoint are read from the arguments or, if missing,
         from the environment variables (for example from the ``.env`` file); they are never saved in the results.
